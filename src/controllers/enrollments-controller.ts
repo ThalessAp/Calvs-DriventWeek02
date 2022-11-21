@@ -40,3 +40,30 @@ export async function getAddressFromCEP(req: AuthenticatedRequest, res: Response
     }
   }
 }
+
+export async function getTickesType(req: AuthenticatedRequest, res: Response) {
+  try {
+    const type = await enrollmentsService.getTypeOfTickets();
+    return res.status(httpStatus.OK).send(type);
+  } catch (error) {
+    if (error.name === "NotFoundError") {
+      return res.send(httpStatus.NO_CONTENT);
+    }
+  }
+}
+
+export async function getTickesOfUser(req: AuthenticatedRequest, res: Response) {
+  const userId = req;
+
+  try {
+    const query = await enrollmentsService.getTicketOfUser(userId);
+
+    if(!query) return res.status(httpStatus.NOT_FOUND);
+
+    return res.status(httpStatus.OK).send(query);
+  } catch (error) {
+    if (error.name === "NotFoundError") {
+      return res.send(httpStatus.NO_CONTENT);
+    }    
+  }
+}

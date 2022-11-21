@@ -6,6 +6,7 @@ import addressRepository, { CreateAddressParams } from "@/repositories/address-r
 import enrollmentRepository, { CreateEnrollmentParams } from "@/repositories/enrollment-repository";
 import { exclude } from "@/utils/prisma-utils";
 import { Address, Enrollment } from "@prisma/client";
+import { prisma } from "@/config";
 
 async function getAddressFromCEP(cep: string): Promise<AddressEnrollment> {
   const result = await getAddress(cep);
@@ -80,6 +81,14 @@ function getAddressForUpsert(address: CreateAddressParams) {
   };
 }
 
+function getTypeOfTickets() {
+  return prisma.TicketType.findMany();
+}
+
+function getTicketOfUser(userId) {
+  return prisma.Ticket.enrollmentId.findFirst(prisma.Enrollment.id == userId);
+}
+
 export type CreateOrUpdateEnrollmentWithAddress = CreateEnrollmentParams & {
   address: CreateAddressParams;
 };
@@ -87,7 +96,9 @@ export type CreateOrUpdateEnrollmentWithAddress = CreateEnrollmentParams & {
 const enrollmentsService = {
   getOneWithAddressByUserId,
   createOrUpdateEnrollmentWithAddress,
-  getAddressFromCEP
+  getAddressFromCEP,
+  getTypeOfTickets,
+  getTicketOfUser
 };
 
 export default enrollmentsService;
